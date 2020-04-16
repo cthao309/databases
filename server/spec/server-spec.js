@@ -12,14 +12,20 @@ describe('Persistent Node Chat Server', function() {
     dbConnection = mysql.createConnection({
       user: 'student',
       password: 'student',
-      database: 'chat'
+      database: 'chat',
+      multipleStatements: true
     });
     dbConnection.connect();
 
-       var tablename = ""; // TODO: fill this out
+    var tablename = 'messages'; // TODO: fill this out
 
     /* Empty the db table before each test so that multiple tests
      * (or repeated runs of the tests) won't screw each other up: */
+    dbConnection.query(`SET FOREIGN_KEY_CHECKS = 0;
+                        TRUNCATE roomNames;
+                        TRUNCATE userNames;
+                        SET FOREIGN_KEY_CHECKS = 1;`);
+
     dbConnection.query('truncate ' + tablename, done);
   });
 
@@ -49,7 +55,11 @@ describe('Persistent Node Chat Server', function() {
 
         // TODO: You might have to change this test to get all the data from
         // your message table, since this is schema-dependent.
-        var queryString = 'SELECT * FROM messages';
+        var queryString = `SELECT * FROM messages
+                            INNER JOIN roomNames
+                              ON roomName.id = messages.roomid
+                            INNER JOIN userNames
+                              on userNames.id = messages.userid`;
         var queryArgs = [];
 
         dbConnection.query(queryString, queryArgs, function(err, results) {
@@ -57,7 +67,7 @@ describe('Persistent Node Chat Server', function() {
           expect(results.length).to.equal(1);
 
           // TODO: If you don't have a column named text, change this test.
-          expect(results[0].text).to.equal('In mercy\'s name, three days is all I need.');
+          expect(results[0].txt).to.equal('In mercy\'s name, three days is all I need.');
 
           done();
         });
@@ -67,8 +77,13 @@ describe('Persistent Node Chat Server', function() {
 
   it('Should output all messages from the DB', function(done) {
     // Let's insert a message into the db
-       var queryString = "";
-       var queryArgs = [];
+      var queryString = `INSERT INTO userNames (name) VALUES (?);
+                          INSERT INTO roomNames (name) VALUES (?);
+                          INSERT INTO messages(txt, roomid, userid, createdAt)
+                          VALUES (?, (SELECT id from roomNames WHERE name = ?),
+                            (SELECT id from userNames WHERE name = ?), ?);`
+      var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      var queryArgs = ['Valjean', 'main', 'Men like you can never change!', 'main', 'Valjean', date];
     // TODO - The exact query string and query args to use
     // here depend on the schema you design, so I'll leave
     // them up to you. */
