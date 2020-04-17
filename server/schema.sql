@@ -7,15 +7,15 @@ USE chat;
 
 /* Create tables and define schemas for them here! */
 
-CREATE TABLE userNames (
+CREATE TABLE users (
   id INT NOT NULL AUTO_INCREMENT,
-  name varchar(255),
+  user_name varchar(255),
   PRIMARY KEY(id)
 );
 
-CREATE TABLE roomNames (
+CREATE TABLE rooms (
   id INT NOT NULL AUTO_INCREMENT,
-  name varchar(255),
+  room_name varchar(255),
   PRIMARY KEY(id)
 );
 
@@ -24,10 +24,9 @@ CREATE TABLE messages (
   txt varchar(255),
   roomid INT,
   userid INT,
-  createdAt DATETIME,
   PRIMARY KEY(id),
-  FOREIGN KEY (roomid) REFERENCES roomNames(id),
-  FOREIGN KEY (userid) REFERENCES userNames(id)
+  FOREIGN KEY (roomid) REFERENCES rooms(id),
+  FOREIGN KEY (userid) REFERENCES users(id)
 );
 
 
