@@ -42,7 +42,7 @@ module.exports = {
       // create a user
       let queryStr = "INSERT INTO users(user_name) VALUES (?)";
 
-      db.query(queryStr, (err, results) => {
+      db.query(queryStr, params, (err, results) => {
         callback(results)
       })
     }
