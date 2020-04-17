@@ -57,8 +57,6 @@ module.exports = {
           if(!err) res.sendStatus(201);
         });
 
-
-
       // let params = [req.body[user_name]];
 
       // models.users.post(params, (err, results) => {
